@@ -606,3 +606,67 @@ img {
         font-size: 34px;
     }
 }
+
+.music-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+.music-card {
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+}
+.cover-wrap {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    margin-bottom: 10px;
+    transition: transform 0.2s;
+}
+.music-card:hover .cover-wrap {
+    transform: scale(1.04);
+}
+.cover-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.yt-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.music-card:hover .yt-overlay {
+    opacity: 1;
+}
+.yt-btn {
+    width: 40px;
+    height: 40px;
+    background: #ff0000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.song-title {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0 0 4px;
+}
+.song-sub {
+    color: rgba(255,255,255,0.45);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin: 0;
+}
