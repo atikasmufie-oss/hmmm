@@ -4,7 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glassmorphism Login Form</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-from: #0f0c29;
+            --bg-mid: #302b63;
+            --bg-to: #24243e;
+            --card-bg: rgba(255,255,255,0.07);
+            --card-border: rgba(255,255,255,0.15);
+            --accent: #e0c97f;
+            --accent2: #f7e9b0;
+            --text: #f0ece0;
+            --muted: rgba(240,236,224,0.5);
+            --input-bg: rgba(255,255,255,0.06);
+            --input-border: rgba(255,255,255,0.18);
+            --input-focus: #e0c97f;
+            --error: #ff7070;
+            --success: #6fffa4;
+            --radius: 20px;
+            --shadow: 0 8px 48px rgba(0,0,0,0.45);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bg-from), var(--bg-mid), var(--bg-to));
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: blobFloat 8s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::before {
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, #e0c97f, transparent 70%);
+            top: -120px; left: -120px;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #7f9ce0, transparent 70%);
+            bottom: -100px; right: -100px;
+            animation-delay: 3s;
+        }
+        @keyframes blobFloat {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(40px, 30px) scale(1.08); }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            animation: cardIn 0.7s cubic-bezier(.22,1,.36,1) both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 44px 40px 36px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(224,201,127,0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .login-header { margin-bottom: 32px; text-align: center; }
+        .login-header h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+        }
+        .login-header p { margin-top: 6px; font-size: 0.88rem; color: var(--muted); font-weight: 300; }
+
+        .form-group { margin-bottom: 20px; }
+
+        .input-wrapper { position: relative; }
+        .input-wrapper input {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            padding: 18px 16px 6px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.25s, background 0.25s;
+        }
+        .input-wrapper input:focus { border-color: var(--input-focus); background: rgba(224,201,127,0.07); }
+        .input-wrapper input::placeholder { color: transparent; }
+
+        .input-wrapper label {
+            position: absolute;
+            left: 16px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            color: var(--muted);
+            pointer-events: none;
+            transition: all 0.2s ease;
+        }
+        .input-wrapper input:focus ~ label,
+        .input-wrapper input:not(:placeholder-shown) ~ label {
+            top: 10px; transform: none;
+            font-size: 0.72rem; color: var(--accent); letter-spacing: 0.5px;
+        }
+
+        .focus-border {
+            display: block; position: absolute;
+            bottom: 0; left: 50%; width: 0; height: 2px;
+            background: var(--accent);
+            border-radius: 0 0 12px 12px;
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+        .input-wrapper input:focus ~ .focus-border { width: 100%; left: 0; }
+
+        .password-wrapper input { padding-right: 48px; }
+        .password-toggle {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            padding: 4px; display: flex; align-items: center; justify-content: center;
+            opacity: 0.6; transition: opacity 0.2s;
+        }
+        .password-toggle:hover { opacity: 1; }
+
+        .eye-icon {
+            display: block; width: 20px; height: 20px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f0ece0' stroke-width='2'%3E%3Cpath d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/contain no-repeat;
+        }
+        .eye-icon.hidden {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f0ece0' stroke-width='2'%3E%3Cpath d='M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24'/%3E%3Cline x1='1' y1='1' x2='23' y2='23'/%3E%3C/svg%3E");
+        }
+
+        .error-message { display: block; font-size: 0.75rem; color: var(--error); margin-top: 6px; min-height: 16px; padding-left: 4px; }
+
+        .form-options { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+
+        .remember-wrapper { display: flex; align-items: center; cursor: pointer; user-select: none; }
+        .remember-wrapper input[type="checkbox"] { display: none; }
+        .checkmark {
+            display: inline-block; width: 16px; height: 16px;
+            border: 1.5px solid var(--input-border); border-radius: 4px;
+            margin-right: 8px; position: relative; transition: border-color 0.2s, background 0.2s; flex-shrink: 0;
+        }
+        .remember-wrapper input:checked ~ .checkbox-label .checkmark { background: var(--accent); border-color: var(--accent); }
+        .remember-wrapper input:checked ~ .checkbox-label .checkmark::after {
+            content: ''; position: absolute; left: 4px; top: 1px;
+            width: 5px; height: 9px; border: 2px solid #1a1a2e;
+            border-top: none; border-left: none; transform: rotate(45deg);
+        }
+        .checkbox-label { display: flex; align-items: center; font-size: 0.82rem; color: var(--muted); }
+        .forgot-password { font-size: 0.82rem; color: var(--accent); text-decoration: none; transition: color 0.2s; }
+        .forgot-password:hover { color: var(--accent2); text-decoration: underline; }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.25s; letter-spacing: 0.5px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .login-btn {
+            background: linear-gradient(135deg, var(--accent), #c8a94f);
+            color: #1a1530; box-shadow: 0 4px 20px rgba(224,201,127,0.35);
+            position: relative; overflow: hidden;
+        }
+        .login-btn::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: translateX(-100%); transition: transform 0.4s ease;
+        }
+        .login-btn:hover::before { transform: translateX(100%); }
+        .login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(224,201,127,0.5); }
+        .login-btn.loading .btn-text { opacity: 0; }
+        .login-btn.loading .btn-loader { display: block; }
+
+        .btn-loader {
+            display: none; width: 18px; height: 18px;
+            border: 2px solid rgba(26,21,48,0.3); border-top-color: #1a1530;
+            border-radius: 50%; animation: spin 0.7s linear infinite; position: absolute;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .home-btn {
+            background: transparent; border: 1px solid var(--input-border);
+            color: var(--muted); margin-top: 10px;
+            font-size: 0.85rem; font-family: 'DM Sans', sans-serif; font-weight: 400;
+        }
+        .home-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(224,201,127,0.06); }
+
+        .alert { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; text-align: center; }
+        .alert.error { background: rgba(255,112,112,0.15); color: var(--error); border: 1px solid rgba(255,112,112,0.3); }
+        .alert.success-alert { background: rgba(111,255,164,0.12); color: var(--success); border: 1px solid rgba(111,255,164,0.3); }
+
+        .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 18px; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--input-border); }
+        .divider span { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+        .social-login { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .social-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 11px 14px; border-radius: 12px; border: 1px solid var(--input-border);
+            background: var(--input-bg); color: var(--text);
+            font-family: 'DM Sans', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.22s;
+        }
+        .social-btn:hover { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+
+        .social-icon { width: 18px; height: 18px; display: block; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .google-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E"); }
+        .github-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f0ece0' d='M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z'/%3E%3C/svg%3E"); }
+
+        .signup-link { text-align: center; }
+        .signup-link p { font-size: 0.83rem; color: var(--muted); }
+        .signup-link a { color: var(--accent); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+        .signup-link a:hover { color: var(--accent2); text-decoration: underline; }
+
+        .success-message { display: none; text-align: center; padding: 20px 0; animation: fadeIn 0.5s ease; }
+        .success-message.show { display: block; }
+        .success-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--accent), #c8a94f);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: #1a1530; font-weight: bold;
+            margin: 0 auto 14px; animation: popIn 0.5s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .success-message h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; color: var(--success); margin-bottom: 6px; }
+        .success-message p { font-size: 0.85rem; color: var(--muted); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-height: 700px) {
+            .login-card { padding: 28px 32px 24px; }
+            body { align-items: flex-start; padding: 20px 0; }
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -13,23 +274,23 @@
                 <h2>Selamat Datang Kembali</h2>
                 <p>Sign in ke Akun Anda</p>
             </div>
-            
+
             <form class="login-form" id="loginForm" novalidate>
                 <div class="form-group">
                     <div class="input-wrapper">
-                        <input type="text" id="username" name="username" required autocomplete="username">
-                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder=" " required autocomplete="username">
+                        <label for="username">Nama Pengguna</label>
                         <span class="focus-border"></span>
                     </div>
-                    <span class="error-message" id="emailError"></span>
+                    <span class="error-message" id="usernameError"></span>
                 </div>
 
                 <div class="form-group">
                     <div class="input-wrapper password-wrapper">
-                        <input type="password" id="password" name="password" required autocomplete="current-password">
+                        <input type="password" id="password" name="password" placeholder=" " required autocomplete="current-password">
                         <label for="password">Password</label>
                         <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
-                            <span class="eye-icon"></span>
+                            <span class="eye-icon" id="eyeIcon"></span>
                         </button>
                         <span class="focus-border"></span>
                     </div>
@@ -47,10 +308,15 @@
                     <a href="#" class="forgot-password">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="login-btn btn">
-                    <span class="btn-text">Sign In</span>
+                <button type="submit" class="login-btn btn" id="loginBtn">
+                    <span class="btn-text">Masuk</span>
                     <span class="btn-loader"></span>
                 </button>
+
+                <button type="button" class="home-btn btn" onclick="location.href='../index.html';">
+                    ← Home
+                </button>
+
                 <div id="alertBox" class="alert" style="display:none;"></div>
             </form>
 
@@ -70,21 +336,75 @@
             </div>
 
             <div class="signup-link">
-                <p>Don't have an account? <a href="#">Sign up</a></p>
+                <p>Belum punya akun? <a href="register.html">Daftar</a></p>
             </div>
 
             <div class="success-message" id="successMessage">
                 <div class="success-icon">✓</div>
-                <h3>Login Successful!</h3>
-                <p>Redirecting to your dashboard...</p>
+                <h3>Login Berhasil!</h3>
+                <p>Mengalihkan ke dashboard kamu...</p>
             </div>
         </div>
     </div>
 
-    <script src="../../shared/js/form-utils.js"></script>
-    <script src="script.js"></script>
-    <div id="alertBox" class="alert" style="display:none;"></div>
-    
-<script src="js/login.js"></script>
+    <script>
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        passwordToggle.addEventListener('click', () => {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            eyeIcon.classList.toggle('hidden', isHidden);
+        });
+
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const alertBox = document.getElementById('alertBox');
+        const successMessage = document.getElementById('successMessage');
+
+        function showAlert(msg, type = 'error') {
+            alertBox.textContent = msg;
+            alertBox.className = 'alert ' + (type === 'error' ? 'error' : 'success-alert');
+            alertBox.style.display = 'block';
+        }
+        function hideAlert() { alertBox.style.display = 'none'; }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAlert();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const usernameError = document.getElementById('usernameError');
+            const passwordError = document.getElementById('passwordError');
+
+            usernameError.textContent = '';
+            passwordError.textContent = '';
+
+            let valid = true;
+            if (!username) { usernameError.textContent = 'Nama pengguna tidak boleh kosong.'; valid = false; }
+            if (!password) { passwordError.textContent = 'Password tidak boleh kosong.'; valid = false; }
+            if (!valid) return;
+
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            await new Promise(r => setTimeout(r, 1800));
+
+            loginBtn.classList.remove('loading');
+            loginBtn.disabled = false;
+
+            // Ganti logika ini sesuai backend kamu
+            if (username === 'admin' && password === '12345') {
+                loginForm.style.display = 'none';
+                successMessage.classList.add('show');
+            } else {
+                showAlert('Username atau password salah. Coba lagi.', 'error');
+            }
+        });
+    </script>
+
+    <script src="js/login.js" onerror="console.warn('login.js tidak ditemukan.')"></script>
 </body>
 </html>
