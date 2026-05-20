@@ -555,17 +555,6 @@
             confirmErr.textContent = '';
             alertBox.style.display = 'none';
 
-            let valid = true;
-            if (!username) { usernameErr.textContent = 'Nama pengguna tidak boleh kosong.'; valid = false; }
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { emailErr.textContent = 'Email tidak valid.'; valid = false; }
-            if (password.length < 6) { passwordErr.textContent = 'Password minimal 6 karakter.'; valid = false; }
-            if (password !== confirm) { confirmErr.textContent = 'Password tidak cocok.'; valid = false; }
-            if (!valid) return;
-
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            if (users[username]) {
-                usernameErr.textContent = 'Username sudah dipakai, coba yang lain.';
-                return;
             }
 
             registerBtn.classList.add('loading');
