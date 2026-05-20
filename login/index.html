@@ -196,12 +196,6 @@
 
         .error-message { display: block; font-size: 0.75rem; color: var(--error); margin-top: 6px; min-height: 16px; padding-left: 4px; }
 
-        .strength-bar-wrap { margin-top: 8px; display: none; }
-        .strength-bar-wrap.show { display: block; }
-        .strength-bar-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 4px; }
-        .strength-bar-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s, background 0.3s; }
-        .strength-label { font-size: 0.72rem; color: var(--muted); }
-
         .form-options { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .remember-wrapper { display: flex; align-items: center; cursor: pointer; user-select: none; }
         .remember-wrapper input[type="checkbox"] { display: none; }
@@ -304,7 +298,6 @@
                 <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Daftar</button>
             </div>
 
-            <!-- PANEL LOGIN -->
             <div class="panel active" id="panelLogin">
                 <div class="login-header">
                     <h2>Selamat Datang Kembali</h2>
@@ -373,7 +366,6 @@
                 </div>
             </div>
 
-            <!-- PANEL REGISTER -->
             <div class="panel" id="panelRegister">
                 <div class="login-header">
                     <h2>Buat Akun Baru</h2>
@@ -392,7 +384,7 @@
 
                     <div class="form-group">
                         <div class="input-wrapper">
-                            <input type="email" id="regEmail" name="regEmail" placeholder=" " required autocomplete="email">
+                            <input type="text" id="regEmail" name="regEmail" placeholder=" " required>
                             <label for="regEmail">Email</label>
                             <span class="focus-border"></span>
                         </div>
@@ -407,12 +399,6 @@
                                 <span class="eye-icon" id="eyeIconReg"></span>
                             </button>
                             <span class="focus-border"></span>
-                        </div>
-                        <div class="strength-bar-wrap" id="strengthWrap">
-                            <div class="strength-bar-track">
-                                <div class="strength-bar-fill" id="strengthFill"></div>
-                            </div>
-                            <span class="strength-label" id="strengthLabel"></span>
                         </div>
                         <span class="error-message" id="regPasswordError"></span>
                     </div>
@@ -467,34 +453,7 @@
             icon.classList.toggle('hidden', isHidden);
         }
 
-        document.getElementById('regPassword').addEventListener('input', function() {
-            const val = this.value;
-            const wrap = document.getElementById('strengthWrap');
-            const fill = document.getElementById('strengthFill');
-            const label = document.getElementById('strengthLabel');
-
-            if (!val) { wrap.classList.remove('show'); return; }
-            wrap.classList.add('show');
-
-            let score = 0;
-            if (val.length >= 8) score++;
-            if (/[A-Z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
-            if (/[^A-Za-z0-9]/.test(val)) score++;
-
-            const levels = [
-                { pct: '25%', color: '#ff7070', text: 'Lemah' },
-                { pct: '50%', color: '#ffb347', text: 'Lumayan' },
-                { pct: '75%', color: '#e0c97f', text: 'Kuat' },
-                { pct: '100%', color: '#6fffa4', text: 'Sangat Kuat' },
-            ];
-            const lvl = levels[score - 1] || levels[0];
-            fill.style.width = lvl.pct;
-            fill.style.background = lvl.color;
-            label.textContent = lvl.text;
-            label.style.color = lvl.color;
-        });
-
+        // ==================== PROSES LOGIN ====================
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -510,13 +469,13 @@
             alertBox.style.display = 'none';
 
             let valid = true;
-            if (!username) { usernameError.textContent = 'Nama pengguna tidak boleh kosong.'; valid = false; }
-            if (!password) { passwordError.textContent = 'Password tidak boleh kosong.'; valid = false; }
+            if (!username) { usernameError.textContent = 'Nama pengguna wajib diisi.'; valid = false; }
+            if (!password) { passwordError.textContent = 'Password wajib diisi.'; valid = false; }
             if (!valid) return;
 
             loginBtn.classList.add('loading');
             loginBtn.disabled = true;
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 1000));
             loginBtn.classList.remove('loading');
             loginBtn.disabled = false;
 
@@ -534,6 +493,7 @@
             }
         });
 
+        // ==================== PROSES REGISTER ====================
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -555,15 +515,35 @@
             confirmErr.textContent = '';
             alertBox.style.display = 'none';
 
+            let valid = true;
+            if (!username) { usernameErr.textContent = 'Username kosong!'; valid = false; }
+            if (!email) { emailErr.textContent = 'Email kosong!'; valid = false; }
+            if (!password) { passwordErr.textContent = 'Password kosong!'; valid = false; }
+            
+            // Peringatan jika password tidak cocok
+            if (password !== confirm) { 
+                confirmErr.textContent = 'Password tidak cocok!'; 
+                valid = false; 
+            }
+            
+            if (!valid) return;
+
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+
+            if (users[username]) {
+                alertBox.textContent = 'Username sudah dipakai orang lain!';
+                alertBox.className = 'alert error';
+                alertBox.style.display = 'block';
+                return;
             }
 
             registerBtn.classList.add('loading');
             registerBtn.disabled = true;
-            await new Promise(r => setTimeout(r, 1500));
+            await new Promise(r => setTimeout(r, 1000));
             registerBtn.classList.remove('loading');
             registerBtn.disabled = false;
 
-            users[username] = { email, password };
+            users[username] = { email: email, password: password };
             localStorage.setItem('users', JSON.stringify(users));
 
             document.getElementById('registerForm').style.display = 'none';
@@ -572,12 +552,10 @@
             setTimeout(() => {
                 document.getElementById('registerForm').style.display = '';
                 document.getElementById('successRegister').classList.remove('show');
+                document.getElementById('registerForm').reset();
                 switchTab('login');
-            }, 2000);
+            }, 1500);
         });
     </script>
-
-    <script src="js/login.js" onerror="console.warn('login.js tidak ditemukan.')"></script>
-    
-    </body>
+</body>
 </html>
